@@ -1,4 +1,4 @@
-# app.py - Backend Flask cho ThamAI_v3 (OpenAI API mới, có logging & xử lý lỗi)
+# app.py - Backend Flask cho ThamAI_v3 (OpenAI API mới)
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from openai import OpenAI
@@ -11,58 +11,64 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# Cấu hình logging
+# Logging
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
-# Kiểm tra khóa API
+# Lấy API key
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
-    logging.error("❌ Thiếu biến môi trường OPENAI_API_KEY trong file .env")
-    raise ValueError("Thiếu biến môi trường OPENAI_API_KEY")
+    logging.error("❌ Thiếu OPENAI_API_KEY trong .env")
+    raise ValueError("Thiếu OPENAI_API_KEY")
 
-# Khởi tạo client OpenAI
+# Khởi tạo client SDK mới
 client = OpenAI(api_key=api_key)
 logging.info("✅ OpenAI client đã khởi tạo thành công.")
 
 
-# -------------------- ROUTE CHÍNH --------------------
+# -------------------- ROUTE /chat --------------------
 @app.route("/chat", methods=["POST"])
 def chat():
-    """Nhận tin nhắn người dùng và trả phản hồi từ ThamAI."""
     try:
         data = request.get_json()
         user_message = data.get("message", "").strip()
 
         if not user_message:
-            return jsonify({"reply": "Vui lòng nhập nội dung để trò chuyện."}), 400
+            return jsonify({"reply": "Vui lòng nhập nội dung."}), 400
 
         logging.info(f"👤 User: {user_message}")
 
-        # Gọi API mới của OpenAI
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Bạn là ThamAI – trợ lý thân thiện, có cảm xúc và biết nói chuyện tự nhiên."},
-                {"role": "user", "content": user_message},
+        # API mới: /responses
+        response = client.responses.create(
+            model="gpt-4o-mini",
+            input=[
+                {
+                    "role": "system",
+                    "content": "Bạn là ThamAI – trợ lý thân thiện, có cảm xúc và nói chuyện tự nhiên."
+                },
+                {
+                    "role": "user",
+                    "content": user_message
+                }
             ],
             temperature=0.8,
-            max_tokens=500
+            max_output_tokens=300
         )
 
-        reply = response.choices[0].message.content.strip()
+        reply = response.output_text
         logging.info(f"🤖 ThamAI: {reply}")
+
         return jsonify({"reply": reply})
 
     except Exception as e:
         logging.error(f"Lỗi xử lý: {e}", exc_info=True)
-        return jsonify({"reply": f"Lỗi khi xử lý yêu cầu: {str(e)}"}), 500
+        return jsonify({"reply": f"Lỗi server: {str(e)}"}), 500
 
 
-# -------------------- TRANG KIỂM TRA --------------------
+# -------------------- ROUTE / --------------------
 @app.route("/", methods=["GET"])
 def home():
     return jsonify({
@@ -71,8 +77,8 @@ def home():
     })
 
 
-# -------------------- KHỞI ĐỘNG --------------------
+# -------------------- KHỞI ĐỘNG LOCAL --------------------
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
-    logging.info(f"🚀 Đang chạy Flask server trên cổng {port}")
+    logging.info(f"🚀 Chạy Flask trên cổng {port}")
     app.run(host="0.0.0.0", port=port)

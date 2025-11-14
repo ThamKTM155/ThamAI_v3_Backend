@@ -1,14 +1,8 @@
 flask==3.0.3
 flask-cors==4.0.1
 
-# OpenAI Python SDK mới – bắt buộc
 openai==1.51.0
-
-# Gunicorn để Render chạy production server
+python-dotenv==1.0.1
 gunicorn==22.0.0
 
-# Đọc biến môi trường từ file .env (local)
-python-dotenv==1.0.1
-
-# (Tuỳ chọn) Logging gọn gàng hơn
 blinker==1.8.2
