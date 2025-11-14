@@ -1,0 +1,57 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+
+# Byte-compiled / optimized / DLL files
+*.so
+*.dll
+*.dylib
+
+# --- Environment Files ---
+.env
+.env.local
+.env.production
+.env.development
+
+# --- Virtual Environments ---
+venv/
+env/
+ENV/
+.venv/
+.pyenv/
+
+# --- Logs ---
+*.log
+logs/
+*.out
+*.err
+
+# --- OS Files ---
+.DS_Store
+Thumbs.db
+
+# --- IDE / Editor Specific ---
+.vscode/
+.idea/
+*.iml
+
+# --- Python Packaging ---
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- Node (nếu dùng thêm các tool JS) ---
+node_modules/
+
+# --- Temp Files ---
+tmp/
+temp/
+*.tmp
+*.bak
+
+# --- Render Deployment ---
+render.yaml
