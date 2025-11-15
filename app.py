@@ -18,14 +18,13 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
-# Lấy API key
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
+# Lấy API key từ biến môi trường
+if not os.getenv("OPENAI_API_KEY"):
     logging.error("❌ Thiếu OPENAI_API_KEY trong .env")
     raise ValueError("Thiếu OPENAI_API_KEY")
 
-# Khởi tạo client SDK mới
-client = OpenAI(api_key=api_key)
+# Khởi tạo client ĐÚNG CHUẨN
+client = OpenAI()
 logging.info("✅ OpenAI client đã khởi tạo thành công.")
 
 
@@ -45,20 +44,16 @@ def chat():
         response = client.responses.create(
             model="gpt-4o-mini",
             input=[
-                {
-                    "role": "system",
-                    "content": "Bạn là ThamAI – trợ lý thân thiện, có cảm xúc và nói chuyện tự nhiên."
-                },
-                {
-                    "role": "user",
-                    "content": user_message
-                }
+                {"role": "system",
+                 "content": "Bạn là ThamAI – trợ lý thân thiện và có cảm xúc."},
+                {"role": "user", "content": user_message}
             ],
             temperature=0.8,
             max_output_tokens=300
         )
 
-        reply = response.output_text
+        # Lấy text trả lời theo đúng cấu trúc SDK
+        reply = response.output[0].content[0].text
         logging.info(f"🤖 ThamAI: {reply}")
 
         return jsonify({"reply": reply})
