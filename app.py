@@ -18,12 +18,12 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
-# Lấy API key từ biến môi trường
+# Kiểm tra API key
 if not os.getenv("OPENAI_API_KEY"):
-    logging.error("❌ Thiếu OPENAI_API_KEY trong .env")
+    logging.error("❌ Thiếu OPENAI_API_KEY trong .env hoặc Render Environment")
     raise ValueError("Thiếu OPENAI_API_KEY")
 
-# Khởi tạo client ĐÚNG CHUẨN
+# Khởi tạo client đúng chuẩn (SDK sẽ tự lấy key từ ENV)
 client = OpenAI()
 logging.info("✅ OpenAI client đã khởi tạo thành công.")
 
@@ -52,7 +52,6 @@ def chat():
             max_output_tokens=300
         )
 
-        # Lấy text trả lời theo đúng cấu trúc SDK
         reply = response.output[0].content[0].text
         logging.info(f"🤖 ThamAI: {reply}")
 
